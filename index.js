@@ -1,6 +1,6 @@
 const express = require('express');
 const cors = require('cors');
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 require('dotenv').config();
 const app = express()
 const port = process.env.PORT || 5000;
@@ -22,16 +22,23 @@ async function run(){
             const cursor = productCollection.find(query);
             const products = await cursor.toArray();
             res.send(products);
+        });
+        // delete 
+        app.delete('/product/:id', async(req, res)=>{
+            const id = req.params.id;
+            console.log(id);
+            const query = {_id: ObjectId(id)};
+            const result = await productCollection.deleteOne(query);
+            res.send(result);
         })
     }
     finally{
-
-    }
+}
 }
 run().catch(console.dir);
 
 app.get('/', (req, res) => {
-    res.send('Hello World!')
+    res.send('Running Car Manager!')
 });
 
 app.listen(port, () => {
