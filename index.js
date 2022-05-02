@@ -41,8 +41,20 @@ async function run() {
       const product = await productCollection.findOne(query);
       res.send(product);
     });
-    // count api
-    app.put("/product/:id", async (req, res) => {
+    // restock api
+    app.put("/product/plus/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: ObjectId(id) };
+      const product = await productCollection.findOne(query);
+      const newQuantity = parseInt(product.quantity) + parseInt(req.body.quantity);
+      console.log(newQuantity, req.body);
+      await productCollection.updateOne(query, {
+        $set: { quantity: newQuantity + "" },
+      });
+      res.send(product);
+    });
+    // count api 
+    app.put("/product/minus/:id", async (req, res) => {
       const id = req.params.id;
       const query = { _id: ObjectId(id) };
       const product = await productCollection.findOne(query);
@@ -52,6 +64,7 @@ async function run() {
       });
       res.send(product);
     });
+    
   } finally {
   }
 }
