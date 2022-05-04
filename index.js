@@ -46,14 +46,14 @@ async function run() {
       const id = req.params.id;
       const query = { _id: ObjectId(id) };
       const product = await productCollection.findOne(query);
-      const newQuantity = parseInt(product.quantity) + parseInt(req.body.quantity);
-      console.log(newQuantity, req.body);
+      const newQuantity =
+        parseInt(product.quantity) + parseInt(req.body.quantity);
       await productCollection.updateOne(query, {
         $set: { quantity: newQuantity + "" },
       });
       res.send(product);
     });
-    // count api 
+    // count api
     app.put("/product/minus/:id", async (req, res) => {
       const id = req.params.id;
       const query = { _id: ObjectId(id) };
@@ -64,7 +64,13 @@ async function run() {
       });
       res.send(product);
     });
-    
+    // add item api
+    app.post("/product", async (req, res) => {
+      const newProduct = req.body;
+      console.log(newProduct);
+      const result = await productCollection.insertOne(newProduct);
+      res.send(result);
+    });
   } finally {
   }
 }
