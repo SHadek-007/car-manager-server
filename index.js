@@ -1,5 +1,6 @@
 const express = require("express");
 const cors = require("cors");
+const jwt = require("jsonwebtoken");
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 require("dotenv").config();
 const app = express();
@@ -25,6 +26,19 @@ async function run() {
       const cursor = productCollection.find(query);
       const products = await cursor.toArray();
       res.send(products);
+    });
+
+    app.get("/my-items", async (req, res) => {
+      try {
+        const token = req.headers.token;
+        const { email } = jwt.verify(token, process.env.TOKEN);
+        const query = { email };
+        const cursor = productCollection.find(query);
+        const products = await cursor.toArray();
+        res.send(products);
+      } catch (error) {
+        res.send([]);
+      }
     });
     // delete
     app.delete("/product/:id", async (req, res) => {
@@ -70,6 +84,19 @@ async function run() {
       console.log(newProduct);
       const result = await productCollection.insertOne(newProduct);
       res.send(result);
+    });
+
+    app.post("/login", async (req, res) => {
+      try {
+        const user = req.body;
+        const token = jwt.sign(user, process.env.TOKEN, {
+          expiresIn: "1d",
+        });
+
+        res.send({ token });
+      } catch (error) {
+        res.send([]);
+      }
     });
   } finally {
   }
